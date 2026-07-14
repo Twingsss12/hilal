@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Pantauan Hilal - Pemantauan Hilal LDII</title>
+    <!-- Font Modern -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #198754;
+            --primary-dark: #0f5132;
+            --bg-body: #f4f6f9;
+            --text-dark: #212529;
+            --text-muted: #6c757d;
+            --border-color: #edf2f7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+        }
+
+        /* Navigasi Utama */
+        .navbar {
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-brand { display: flex; align-items: center; gap: 12px; }
+        .nav-brand img { width: 45px; height: 45px; }
+        .nav-brand h1 { font-size: 18px; font-weight: 600; color: var(--primary-dark); }
+        .nav-menu { display: flex; align-items: center; gap: 10px; list-style: none; }
+        .nav-link { text-decoration: none; color: #495057; font-size: 14px; font-weight: 500; padding: 8px 16px; cursor: pointer; }
+        .nav-item.active .nav-link { color: var(--primary-color); }
+        .user-profile { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background-color: #f8f9fa; border-radius: 30px; border: 1px solid #dee2e6; }
+
+        /* Container Layout */
+        .container {
+            max-width: 1150px;
+            margin: 30px auto 50px auto;
+            padding: 0 20px;
+        }
+
+        .breadcrumb {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        .breadcrumb a { color: var(--primary-color); text-decoration: none; }
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h2 { font-size: 24px; font-weight: 600; }
+        .page-header p { font-size: 13px; color: var(--text-muted); }
+        .required-star { color: #dc3545; font-weight: bold; }
+
+        /* Main Grid Content (Split Card Layout) */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 25px;
+            align-items: start;
+        }
+
+        @media (max-width: 992px) {
+            .grid-layout { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Detail Meta Info Layout (Kiri) */
+        .meta-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .meta-item label {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .meta-item p {
+            font-size: 14px;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .alert-box {
+            background-color: #f8f9fa;
+            border: 1px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 12.5px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Form Controls Styling (Kanan) */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+            background-color: #ffffff;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.1);
+        }
+
+        /* Custom File Upload Drag Box */
+        .file-upload-wrapper {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .file-upload-wrapper:hover {
+            border-color: var(--primary-color);
+        }
+
+        .file-upload-wrapper input[type="file"] {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-upload-wrapper i {
+            font-size: 28px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .file-upload-wrapper p {
+            font-size: 12.5px;
+            color: #495057;
+        }
+
+        .file-list-preview {
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--primary-color);
+            list-style: none;
+        }
+
+        .file-list-preview li {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        /* Submit Button */
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(25, 135, 84, 0.15);
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigasi -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="ldii.png" alt="Logo LDII">
+            <h1>Pemantauan Hilal LDII</h1>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
+            <li class="nav-item active"><a href="#" class="nav-link"><i class="fas fa-eye"></i> Pantauan</a></li>
+            <li>
+                <div class="user-profile">
+                    <i class="fas fa-user-circle" style="color: var(--primary-color);"></i>
+                    <span style="font-size: 13px; font-weight: 500;">AbidBima12</span>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Konten Utama -->
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="#">Beranda</a> &raquo; <a href="#">Pantaus</a> &raquo; <span>Input Mandiri</span>
+        </div>
+
+        <div class="page-header">
+            <h2>Pemantauan Hilal 1 Safar 1448 H</h2>
+            <p>Formulir pelaporan pengamatan hilal mandiri di titik lokasi tugas.</p>
+        </div>
+
+        <div class="grid-layout">
+            
+            <!-- 1. KARTU KIRI: Data Referensi & Profil (Statis) -->
+            <div class="card">
+                <div class="card-title"><i class="fas fa-info-circle"></i> Informasi Pemantauan</div>
+                
+                <div class="meta-list">
+                    <div class="meta-item">
+                        <label>Tanggal Pemantauan</label>
+                        <p><i class="far fa-calendar-alt" style="color: var(--primary-color); margin-right: 6px;"></i> 15 July 2026</p>
+                    </div>
+                    
+                    <div class="meta-item">
+                        <label>Nama Pemantau</label>
+                        <p>Abid Bima Fadhilah, S.Kom.</p>
+                    </div>
+                    
+                    <div class="meta-item">
+                        <label>HP Pemantau</label>
+                        <p style="font-family: monospace; letter-spacing: 0.5px;">089646827233</p>
+                    </div>
+
+                    <div class="meta-item">
+                        <label>Lokasi Pengamatan</label>
+                        <p><i class="fas fa-map-marker-alt" style="color: #dc3545; margin-right: 6px;"></i> Anjungan Bandara YIA Kulon Progo</p>
+                    </div>
+
+                    <div class="meta-item" style="margin-top: 5px;">
+                        <label>Rekan Pemantau Lainnya di Lokasi Ini</label>
+                        <div class="alert-box">
+                            <i class="fas fa-users-slash"></i>
+                            <span>Tidak ada pemantau lain yang terdaftar di lokasi ini.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. KARTU KANAN: Formulir Input Laporan (Dinamis) -->
+            <div class="card">
+                <div class="card-title"><i class="fas fa-edit"></i> Isi Data Pengamatan</div>
+                
+                <form id="pantauanForm">
+                    <!-- Input Alat -->
+                    <div class="form-group">
+                        <label for="alat">Alat / Instrumen yang Digunakan</label>
+                        <select id="alat" class="form-control" required>
+                            <option value="">- Pilih Alat -</option>
+                            <option value="manual">Teropong (Manual)</option>
+                            <option value="goto">Teleskop Otomatis (GoTo)</option>
+                            <option value="ccd">Kamera CCD / Kamera Astrofotografi</option>
+                            <option value="mata">Mata Telanjang (Tanpa Alat Optical)</option>
+                        </select>
+                    </div>
+
+                    <!-- Input Waktu Pengamatan -->
+                    <div class="form-group">
+                        <label for="waktu">Waktu Pengamatan (WIB/Lokal)</label>
+                        <input type="time" id="waktu" class="form-control" value="22:23" required>
+                    </div>
+
+                    <!-- Input Status Pengamatan -->
+                    <div class="form-group">
+                        <label for="status">Status Pengamatan <span class="required-star">*</span></label>
+                        <select id="status" class="form-control" required>
+                            <option value="">- Pilih Status -</option>
+                            <option value="terlihat">Hilal Terlihat</option>
+                            <option value="tidak_terlihat" selected>Hilal Tidak Terlihat</option>
+                        </select>
+                    </div>
+
+                    <!-- Input Unggah Foto -->
+                    <div class="form-group">
+                        <label>Berkas / Foto Dokumentasi (Bisa lebih dari 1)</label>
+                        <div class="file-upload-wrapper">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Drag & drop berkas di sini atau <strong>klik untuk memilih file</strong></p>
+                            <input type="file" id="foto" multiple accept="image/*">
+                        </div>
+                        <ul class="file-list-preview" id="fileList"></ul>
+                    </div>
+
+                    <!-- Tombol Kirim -->
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i> Kirim Laporan Pantauan
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JavaScript Logika Form -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('foto');
+            const fileList = document.getElementById('fileList');
+
+            // Fitur Menampilkan List Nama File yang Diunggah
+            fileInput.addEventListener('change', function() {
+                fileList.innerHTML = ""; // Bersihkan list lama
+                
+                if (this.files.length > 0) {
+                    for (let i = 0; i < this.files.length; i++) {
+                        let li = document.createElement('li');
+                        li.innerHTML = `<i class="fas fa-image"></i> ${this.files[i].name} (${(this.files[i].size/1024).toFixed(1)} KB)`;
+                        fileList.appendChild(li);
+                    }
+                }
+            });
+
+            // Handle Submit Form
+            document.getElementById('pantauanForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const statusText = document.getElementById('status').options[document.getElementById('status').selectedIndex].text;
+                
+                alert(`Laporan Berhasil!\nData pengamatan dengan status "${statusText}" telah terkirim dan masuk antrean Sidang Isbat.`);
+            });
+        });
+    </script>
+</body>
+</html>

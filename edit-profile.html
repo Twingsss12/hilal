@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - Pemantauan Hilal LDII</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #198754;
+            --primary-dark: #0f5132;
+            --bg-body: #f4f6f9;
+            --text-dark: #212529;
+            --text-muted: #6c757d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+        }
+
+        /* Navbar Layout */
+        .navbar {
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-brand { display: flex; align-items: center; gap: 12px; }
+        .nav-brand img { width: 45px; height: 45px; }
+        .nav-brand h1 { font-size: 18px; font-weight: 600; color: var(--primary-dark); }
+        .nav-menu { display: flex; align-items: center; gap: 10px; list-style: none; }
+        .nav-link { text-decoration: none; color: #495057; font-size: 14px; font-weight: 500; padding: 8px 16px; cursor: pointer; }
+        .nav-item.active .nav-link { color: var(--primary-color); }
+        .user-profile { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background-color: #f8f9fa; border-radius: 30px; border: 1px solid #dee2e6; }
+
+        /* Main Container */
+        .container {
+            max-width: 900px;
+            margin: 30px auto 50px auto;
+            padding: 0 20px;
+        }
+
+        .breadcrumb {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        .breadcrumb a { color: var(--primary-color); text-decoration: none; }
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h2 { font-size: 24px; font-weight: 600; }
+        .page-header p { font-size: 13px; color: var(--text-muted); }
+        .required-star { color: #dc3545; font-weight: bold; }
+
+        /* Accordion / Card Form Style */
+        .form-section {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            margin-bottom: 15px;
+            overflow: hidden;
+            border: 1px solid #edf2f7;
+        }
+
+        .section-header {
+            padding: 18px 25px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s;
+        }
+
+        .section-header:hover {
+            background-color: #f8f9fa;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .section-title span {
+            background-color: rgba(25, 135, 84, 0.1);
+            color: var(--primary-color);
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .section-header i.fa-chevron-down {
+            font-size: 14px;
+            color: var(--text-muted);
+            transition: transform 0.3s;
+        }
+
+        /* Buka tutup konten seksi */
+        .section-content {
+            padding: 25px;
+            border-top: 1px solid #edf2f7;
+            display: none; /* Default tertutup, dikontrol JS */
+        }
+
+        .form-section.active .section-content {
+            display: block;
+        }
+
+        .form-section.active .section-header i.fa-chevron-down {
+            transform: rotate(180deg);
+            color: var(--primary-color);
+        }
+
+        /* Form Controls Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px 20px;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+
+        .form-group {
+            margin-bottom: 4px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 13.5px;
+            outline: none;
+            transition: all 0.3s;
+            background-color: #ffffff;
+            color: var(--text-dark);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.1);
+        }
+
+        .form-control:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+            border-color: #ced4da;
+        }
+
+        /* Khusus usia & koordinat box */
+        .info-block-box {
+            background-color: #f8f9fa;
+            border: 1px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #495057;
+        }
+
+        .info-block-box p { margin-bottom: 4px; }
+        .info-block-box p:last-child { margin-bottom: 0; }
+
+        .inline-action-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-inline-calc {
+            padding: 11px 15px;
+            background-color: #e9ecef;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        .btn-inline-calc:hover { background-color: #dee2e6; }
+
+        /* Tombol Utama Simpan Seluruh Form */
+        .submit-container {
+            margin-top: 30px;
+            text-align: right;
+        }
+
+        .btn-save-profile {
+            padding: 12px 35px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(25, 135, 84, 0.15);
+            transition: all 0.2s;
+        }
+
+        .btn-save-profile:hover {
+            background-color: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="https://via.placeholder.com/45" alt="Logo LDII">
+            <h1>Pemantauan Hilal LDII</h1>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
+            <li class="nav-item active"><a href="#" class="nav-link"><i class="fas fa-user"></i> Profile</a></li>
+            <li>
+                <div class="user-profile">
+                    <i class="fas fa-user-circle" style="color: var(--primary-color);"></i>
+                    <span style="font-size: 13px; font-weight: 500;">AbidBima12</span>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="#">Beranda</a> &raquo; <a href="#">Profile</a> &raquo; <span>Edit</span>
+        </div>
+
+        <div class="page-header">
+            <h2>Edit Profile Anda</h2>
+            <p>Tanda (<span class="required-star">*</span>) menunjukkan kolom wajib diisi.</p>
+        </div>
+
+        <form id="editProfileForm">
+
+            <div class="form-section active"> <div class="section-header">
+                    <div class="section-title"><span>1</span> Data Profil Pribadi & Kontak</div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="section-content">
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Nama Lengkap dan Gelar <span class="required-star">*</span></label>
+                            <input type="text" class="form-control" value="Abid Bima Fadhilah, S.Kom." required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tanggal Lahir</label>
+                            <input type="date" class="form-control" id="tgl_lahir">
+                        </div>
+                        <div class="form-group">
+                            <label>Usia (Tahun)</label>
+                            <div class="inline-action-group">
+                                <input type="text" class="form-control" id="usia_box" value="Otomatis" readonly style="background-color: #f1f3f5;">
+                                <button type="button" class="btn-inline-calc" onclick="hitungUsia()">Hitung</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Nomor HP <span class="required-star">*</span></label>
+                            <input type="text" class="form-control" value="089646827233" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Alamat Domisili</label>
+                            <input type="text" class="form-control" placeholder="Nama jalan, nomor rumah">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="provinsi">Provinsi</label>
+                            <select id="provinsi" class="form-control" required>
+                                <option value="">-- Pilih Provinsi --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="kabupaten">Kota/Kabupaten</label>
+                            <select id="kabupaten" class="form-control" required disabled>
+                                <option value="">-- Pilih Kota/Kabupaten --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="kecamatan">Kecamatan</label>
+                            <select id="kecamatan" class="form-control" required disabled>
+                                <option value="">-- Pilih Kecamatan --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label Whitespace for="kelurahan">Kelurahan</label>
+                            <select id="kelurahan" class="form-control" required disabled>
+                                <option value="">-- Pilih Kelurahan --</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-title"><span>2</span> Data Kompetensi & Latar Belakang</div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="section-content">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Tingkat Organisasi</label>
+                            <select class="form-control">
+                                <option>-- Pilih Tingkat Organisasi --</option>
+                                <option selected>DPP</option>
+                                <option>DPW</option>
+                                <option>DPD</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Jabatan/Peran di Lapangan</label>
+                            <input type="text" class="form-control" placeholder="Contoh: Pemantau Utama / Perukyat Mandiri">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Latar Belakang Pendidikan</label>
+                            <input type="text" class="form-control" value="S1 Teknik Informatika / Sistem Informasi">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Sertifikasi / Pelatihan Pemantauan yang Pernah Diikuti</label>
+                            <input type="text" class="form-control">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Pengalaman Perukyat (Skill Level - Tahun)</label>
+                            <input type="text" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-title"><span>3</span> Data Inventaris Alat yang Dikuasai</div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="section-content">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Kepemilikan Alat</label>
+                            <select class="form-control">
+                                <option>-- Pilih Kepemilikan Alat --</option>
+                                <option selected>Milik Pribadi</option>
+                                <option>Inventaris Organisasi</option>
+                                <option>Tanpa Alat</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Jenis & Spesifikasi Teleskop</label>
+                            <input type="text" class="form-control" placeholder="Contoh: Refraktor 80mm / Reflektor">
+                        </div>
+                        <div class="form-group">
+                            <label>Jenis Mounting</label>
+                            <select class="form-control">
+                                <option>-- Pilih Jenis Mounting --</option>
+                                <option>Manual</option>
+                                <option>Motorized Tracking</option>
+                                <option>GoTo Otomatis</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Kamera & Filter</label>
+                            <input type="text" class="form-control" placeholder="Contoh: CMOS Hilal Cam / Filter Solar">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Software Pendukung</label>
+                            <input type="text" class="form-control" placeholder="Contoh: Stellarium, SharpCap, Accurate Astro">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-title"><span>4</span> Data Posisi & Titik Observasi</div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="section-content">
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Lokasi Utama <span class="required-star">*</span></label>
+                            <select class="form-control">
+                                <option selected>Anjungan Bandara YIA Kulon Progo - DI Yogyakarta</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Koordinat Pos Pengamatan (POG)</label>
+                            <div class="info-block-box">
+                                <p><strong>Garis Lintang (Latitude):</strong> -7.964400000000</p>
+                                <p><strong>Garis Bujur (Longitude):</strong> 110.057800000000</p>
+                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Kondisi Ufuk Barat</label>
+                            <input type="text" class="form-control" placeholder="Contoh: Terbuka bebas hambatan laut / Terhalang bukit tipis">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-title"><span>5</span> Log Rekam Jejak Pengamatan</div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="section-content">
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Jumlah Pengalaman Rukyat Ramadhan/Syawal (Berapa Kali)</label>
+                            <input type="number" class="form-control" placeholder="0" value="12">
+                        </div>
+                        <div class="form-group">
+                            <label>Status Kesaksian Berhasil</label>
+                            <select class="form-control">
+                                <option>-- Pilih Status Kesaksian --</option>
+                                <option selected>Pernah Melihat Hilal</option>
+                                <option>Belum Pernah</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-title"><span>6</span> Data Akses Login Akun</div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="section-content">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Username <span class="required-star">*</span></label>
+                            <input type="text" class="form-control" value="AbidBima12" required>
+                        </div>
+                        <div class="form-group">
+                            <label>E-mail Akun <span class="required-star">*</span></label>
+                            <input type="email" class="form-control" value="abidbima12@gmail.com" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="submit-container">
+                <button type="submit" class="btn-save-profile">
+                    <i class="fas fa-check-circle"></i> Simpan Perubahan
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ==========================================================================
+            // A. LOGIKA UTAMA: BUKA-TUTUP SEKSI ACCORDION FORM
+            // ==========================================================================
+            const headers = document.querySelectorAll('.section-header');
+            headers.forEach(header => {
+                header.addEventListener('click', function() {
+                    this.parentElement.classList.toggle('active');
+                });
+            });
+
+            // ==========================================================================
+            // B. LOGIKA API: DROPDOWN BERTINGKAT WILAYAH INDONESIA
+            // ==========================================================================
+            const provSelect = document.getElementById('provinsi');
+            const kabSelect = document.getElementById('kabupaten');
+            const kecSelect = document.getElementById('kecamatan');
+            const kelSelect = document.getElementById('kelurahan');
+
+            // API Terbuka Struktur Wilayah Indonesia (Emsifa Open API)
+            const baseUrl = 'https://www.emsifa.com/api-wilayah-indonesia/api';
+
+            // 1. Ambil Data Seluruh Provinsi di Indonesia saat Halaman Dimuat
+            fetch(`${baseUrl}/provinces.json`)
+                .then(res => res.json())
+                .then(provinces => {
+                    provinces.forEach(prov => {
+                        let opt = document.createElement('option');
+                        opt.value = prov.id;
+                        opt.text = prov.name;
+                        provSelect.add(opt);
+                    });
+                })
+                .catch(err => console.error('Gagal mengambil data provinsi:', err));
+
+            // 2. Filter Kabupaten Berdasarkan Provinsi Terpilih
+            provSelect.addEventListener('change', function() {
+                kabSelect.innerHTML = '<option value="">-- Pilih Kota/Kabupaten --</option>';
+                kecSelect.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+                kelSelect.innerHTML = '<option value="">-- Pilih Kelurahan --</option>';
+                
+                kabSelect.disabled = true; kecSelect.disabled = true; kelSelect.disabled = true;
+
+                const provId = this.value;
+                if (provId) {
+                    fetch(`${baseUrl}/regencies/${provId}.json`)
+                        .then(res => res.json())
+                        .then(regencies => {
+                            regencies.forEach(kab => {
+                                let opt = document.createElement('option');
+                                opt.value = kab.id;
+                                opt.text = kab.name;
+                                kabSelect.add(opt);
+                            });
+                            kabSelect.disabled = false;
+                        });
+                }
+            });
+
+            // 3. Filter Kecamatan Berdasarkan Kabupaten Terpilih
+            kabSelect.addEventListener('change', function() {
+                kecSelect.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+                kelSelect.innerHTML = '<option value="">-- Pilih Kelurahan --</option>';
+                
+                kecSelect.disabled = true; kelSelect.disabled = true;
+
+                const kabId = this.value;
+                if (kabId) {
+                    fetch(`${baseUrl}/districts/${kabId}.json`)
+                        .then(res => res.json())
+                        .then(districts => {
+                            districts.forEach(kec => {
+                                let opt = document.createElement('option');
+                                opt.value = kec.id;
+                                opt.text = kec.name;
+                                kecSelect.add(opt);
+                            });
+                            kecSelect.disabled = false;
+                        });
+                }
+            });
+
+            // 4. Filter Kelurahan Berdasarkan Kecamatan Terpilih
+            kecSelect.addEventListener('change', function() {
+                kelSelect.innerHTML = '<option value="">-- Pilih Kelurahan --</option>';
+                kelSelect.disabled = true;
+
+                const kecId = this.value;
+                if (kecId) {
+                    fetch(`${baseUrl}/villages/${kecId}.json`)
+                        .then(res => res.json())
+                        .then(villages => {
+                            villages.forEach(kel => {
+                                let opt = document.createElement('option');
+                                opt.value = kel.id;
+                                opt.text = kel.name;
+                                kelSelect.add(opt);
+                            });
+                            kelSelect.disabled = false;
+                        });
+                }
+            });
+
+            // ==========================================================================
+            // C. INTERSEP FORM SUBMISSION
+            // ==========================================================================
+            document.getElementById('editProfileForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Sukses! Seluruh pembaruan data profil kustom Anda berhasil disimpan ke dalam database pusat.');
+            });
+        });
+
+        // ==========================================================================
+        // D. FUNGSI HITUNG USIA OTOMATIS (MENGGUNAKAN TANGGAL SISTEM)
+        // ==========================================================================
+        function hitungUsia() {
+            const tglLahirVal = document.getElementById('tgl_lahir').value;
+            const usiaBox = document.getElementById('usia_box');
+
+            if (!tglLahirVal) {
+                alert('Silakan pilih Tanggal Lahir Anda terlebih dahulu pada kolom seksi 1.');
+                return;
+            }
+
+            const lahir = new Date(tglLahirVal);
+            const hariIni = new Date();
+            
+            let usia = hariIni.getFullYear() - lahir.getFullYear();
+            const bulanDiff = hariIni.getMonth() - lahir.getMonth();
+            
+            if (bulanDiff < 0 || (bulanDiff === 0 && hariIni.getDate() < lahir.getDate())) {
+                usia--;
+            }
+
+            usiaBox.value = usia + " Tahun";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masukkan Rencana Pemantauan - Pemantauan Hilal LDII</title>
+    <!-- Font Modern -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Leaflet CSS untuk Peta Interaktif -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        :root {
+            --primary-color: #198754;
+            --primary-dark: #0f5132;
+            --bg-body: #f4f6f9;
+            --text-dark: #212529;
+            --text-muted: #6c757d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-brand img { width: 45px; height: 45px; }
+        .nav-brand h1 { font-size: 18px; font-weight: 600; color: var(--primary-dark); }
+        .nav-menu { display: flex; align-items: center; gap: 25px; list-style: none; }
+        .nav-item a { text-decoration: none; color: #495057; font-size: 14px; font-weight: 500; }
+        .nav-item.active a { color: var(--primary-color); }
+        .user-profile { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background-color: #f8f9fa; border-radius: 30px; }
+
+        /* Main Content Layout */
+        .main-container {
+            max-width: 1100px;
+            margin: 30px auto 40px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1.1fr 1.1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 992px) {
+            .main-container { grid-template-columns: 1fr; }
+        }
+
+        .page-title-section {
+            grid-column: 1 / -1;
+        }
+
+        .page-title-section h2 { font-size: 24px; font-weight: 600; }
+        .page-title-section p { font-size: 13px; color: var(--text-muted); }
+
+        .card-panel {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            height: fit-content;
+        }
+
+        /* Form Controls */
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 500; color: #495057; margin-bottom: 6px; }
+        .form-control {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 13.5px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.1);
+        }
+        
+        /* Gaya khusus untuk input terblokir / readonly */
+        .form-control:read-only { 
+            background-color: #e9ecef; 
+            color: #495057;
+            cursor: not-allowed; 
+            border-color: #ced4da;
+        }
+
+        /* Row untuk Koordinat bersandingan */
+        .coordinates-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        .btn-submit:hover { background-color: var(--primary-dark); }
+
+        /* Map Settings */
+        .map-header { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        #map { width: 100%; height: 500px; border-radius: 8px; border: 1px solid #dee2e6; z-index: 1; }
+        .map-hint { font-size: 11px; color: var(--text-muted); margin-top: 8px; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="https://via.placeholder.com/45" alt="Logo LDII">
+            <h1>Pemantauan Hilal LDII</h1>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="dashboard.html"><i class="fas fa-home"></i> Home</a></li>
+            <li class="nav-item active"><a href="#"><i class="fas fa-eye"></i> Pantauan</a></li>
+            <li>
+                <div class="user-profile">
+                    <i class="fas fa-user-circle" style="color: var(--primary-color);"></i>
+                    <span style="font-size: 13px; font-weight: 500; margin-left: 5px;">AbidBima12</span>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <div class="page-title-section">
+            <h2>Masukkan Rencana Pemantauan Kustom</h2>
+            <p>Tentukan periode bulan Hijriah serta titik koordinat lokasi target pantauan Anda.</p>
+        </div>
+
+        <!-- Sisi Kiri: Form Input -->
+        <div class="card-panel">
+            <form id="rencanaKustomForm">
+                <div class="form-group">
+                    <label for="nama">Nama Pemantau</label>
+                    <input type="text" id="nama" class="form-control" value="Abid Bima Fadhilah, S.Kom." readonly>
+                </div>
+
+                <!-- TETAP DIKUNCI: Nomor HP -->
+                <div class="form-group">
+                    <label for="hp">Nomor HP</label>
+                    <input type="text" id="hp" class="form-control" value="089646827233" readonly>
+                </div>
+
+                <!-- SEKARANG DROPDOWN: Pilihan 12 Bulan Hijriah -->
+                <div class="form-group">
+                    <label for="hijriah">Bulan Hijriah yang Dipantau</label>
+                    <select id="hijriah" class="form-control" required>
+                        <option value="">-- Pilih Bulan Hijriah --</option>
+                        <option value="Muharram">1. Muharram</option>
+                        <option value="Safar" selected>2. Safar</option> <!-- Default sesuai gambar sebelumnya -->
+                        <option value="Rabiul Awal">3. Rabi'ul Awal</option>
+                        <option value="Rabiul Akhir">4. Rabi'ul Akhir</option>
+                        <option value="Jumadil Awal">5. Jumadil Awal</option>
+                        <option value="Jumadil Akhir">6. Jumadil Akhir</option>
+                        <option value="Rajab">7. Rajab</option>
+                        <option value="Sya'ban">8. Sya'ban</option>
+                        <option value="Ramadhan">9. Ramadhan</option>
+                        <option value="Syawal">10. Syawal</option>
+                        <option value="Dzulqa'dah">11. Dzulqa'dah</option>
+                        <option value="Dzulhijjah">12. Dzulhijjah</option>
+                    </select>
+                </div>
+
+                <!-- TETAP DIKUNCI: Tanggal Pemantauan Masehi -->
+                <div class="form-group">
+                    <label for="masehi">Tanggal Pemantauan (Masehi)</label>
+                    <input type="date" id="masehi" class="form-control" value="2026-07-15" readonly>
+                </div>
+
+                <!-- BISA DIINPUT MANDIRI: Nama Lokasi Baru -->
+                <div class="form-group">
+                    <label for="nama_lokasi">Nama Lokasi Pemantauan Kustom</label>
+                    <input type="text" id="nama_lokasi" class="form-control" placeholder="Contoh: Pantai Parangkusumo, Bukit Sendang" required>
+                </div>
+
+                <!-- BISA DIINPUT MANDIRI / KLIK PETA: Koordinat -->
+                <div class="coordinates-row">
+                    <div class="form-group">
+                        <label for="latitude">Latitude (Lintang)</label>
+                        <input type="number" step="any" id="latitude" class="form-control" placeholder="Contoh: -7.9844" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="longitude">Longitude (Bujur)</label>
+                        <input type="number" step="any" id="longitude" class="form-control" placeholder="Contoh: 110.3292" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-save"></i> Simpan Lokasi Baru
+                </button>
+            </form>
+        </div>
+
+        <!-- Sisi Kanan: Peta Interaktif -->
+        <div class="card-panel">
+            <div class="map-header">
+                <i class="fas fa-map-marked-alt" style="color: var(--primary-color);"></i>
+                <span>Klik pada peta untuk menentukan titik secara otomatis</span>
+            </div>
+            
+            <div id="map"></div>
+            
+            <p class="map-hint">
+                <i class="fas fa-info-circle"></i> <strong>Informasi Sistem:</strong> <br>
+                Pilih periode siklus bulan Hijriah yang ingin dilaporkan, lalu klik peta atau masukkan koordinat secara manual untuk memetakan lokasi penugasan secara akurat.
+            </p>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Inisialisasi peta berfokus di Indonesia
+            const map = L.map('map').setView([-7.5, 110.5], 7);
+
+            // 2. Load OpenStreetMap Tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            let marker = null;
+            const latInput = document.getElementById('latitude');
+            const lngInput = document.getElementById('longitude');
+            const namaLokasiInput = document.getElementById('nama_lokasi');
+            const hijriahSelect = document.getElementById('hijriah');
+
+            // 3. Deteksi klik pada Peta untuk mengisi Latitude/Longitude
+            map.on('click', function(e) {
+                const lat = e.latlng.lat.toFixed(6);
+                const lng = e.latlng.lng.toFixed(6);
+
+                latInput.value = lat;
+                lngInput.value = lng;
+
+                updateMarker(lat, lng, namaLokasiInput.value || "Titik Lokasi Baru");
+            });
+
+            // 4. Deteksi jika user mengetik koordinat manual di form
+            function handleManualInput() {
+                const lat = parseFloat(latInput.value);
+                const lng = parseFloat(lngInput.value);
+
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    updateMarker(lat, lng, namaLokasiInput.value || "Titik Koordinat");
+                    map.panTo([lat, lng]); 
+                }
+            }
+
+            latInput.addEventListener('input', handleManualInput);
+            lngInput.addEventListener('input', handleManualInput);
+            namaLokasiInput.addEventListener('input', handleManualInput);
+
+            // Fungsi untuk render penanda peta
+            function updateMarker(lat, lng, labelText) {
+                if (marker) {
+                    marker.setLatLng([lat, lng]);
+                } else {
+                    marker = L.marker([lat, lng]).addTo(map);
+                }
+                marker.bindPopup(`<b>${labelText}</b><br>Lat: ${lat}<br>Lng: ${lng}`).openPopup();
+            }
+
+            // 5. Submit Handler
+            document.getElementById('rencanaKustomForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const bulanTerpilih = hijriahSelect.options[hijriahSelect.selectedIndex].text;
+                alert(`Rencana lokasi pemantauan:\n"${namaLokasiInput.value}" \nberhasil disimpan untuk penugasan bulan ${bulanTerpilih}.`);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Pantauan Hilal - Pemantauan Hilal LDII</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #198754;
+            --primary-dark: #0f5132;
+            --bg-body: #f4f6f9;
+            --text-dark: #212529;
+            --text-muted: #6c757d;
+            --border-color: #edf2f7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+        }
+
+        /* Navigasi Utama */
+        .navbar {
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-brand { display: flex; align-items: center; gap: 12px; }
+        .nav-brand img { width: 45px; height: 45px; }
+        .nav-brand h1 { font-size: 18px; font-weight: 600; color: var(--primary-dark); }
+        .nav-menu { display: flex; align-items: center; gap: 10px; list-style: none; }
+        .nav-link { text-decoration: none; color: #495057; font-size: 14px; font-weight: 500; padding: 8px 16px; cursor: pointer; }
+        .nav-item.active .nav-link { color: var(--primary-color); }
+        .user-profile { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background-color: #f8f9fa; border-radius: 30px; border: 1px solid #dee2e6; }
+
+        /* Container Layout */
+        .container {
+            max-width: 1300px;
+            margin: 30px auto 50px auto;
+            padding: 0 20px;
+        }
+
+        .breadcrumb {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        .breadcrumb a { color: var(--primary-color); text-decoration: none; }
+
+        .page-header {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .page-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+        }
+
+        .page-header h2 { font-size: 24px; font-weight: 600; }
+        .page-header p { font-size: 13px; color: var(--text-muted); }
+
+        /* Top Actions & Search Filter Panel */
+        .table-toolbar {
+            background-color: #ffffff;
+            border-radius: 12px 12px 0 0;
+            padding: 20px 25px;
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 300px;
+            width: 100%;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            border: 1.5px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 13.5px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .toolbar-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-primary { background-color: var(--primary-color); color: #ffffff; }
+        .btn-primary:hover { background-color: var(--primary-dark); }
+        .btn-outline { background-color: transparent; border: 1.5px solid #dee2e6; color: #495057; }
+        .btn-outline:hover { background-color: #f8f9fa; border-color: #ced4da; }
+
+        /* Card Wrapper & Responsive Table Container */
+        .table-card {
+            background-color: #ffffff;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        /* Custom Modern Table Style */
+        .modern-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .modern-table th {
+            background-color: #f8f9fa;
+            color: #495057;
+            padding: 16px 20px;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        .modern-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+            color: #333333;
+        }
+
+        .modern-table tbody tr:hover {
+            background-color: rgba(25, 135, 84, 0.02);
+        }
+
+        /* Penataan Hierarki Informasi Kolom */
+        .info-cell p { margin-bottom: 2px; }
+        .info-title { font-weight: 600; color: var(--text-dark); }
+        .info-sub { font-size: 12px; color: var(--text-muted); }
+        .badge-phone { font-family: monospace; font-size: 11px; color: var(--primary-color); }
+
+        /* Badges & Status */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .badge-danger { background-color: #f8d7da; color: #842029; }
+        
+        .status-reason {
+            font-size: 11px;
+            color: #842029;
+            margin-top: 4px;
+            display: block;
+            font-style: italic;
+        }
+
+        /* Footer / Pagination Toolbar */
+        .table-footer {
+            padding: 15px 25px;
+            background-color: #ffffff;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .pagination {
+            display: flex;
+            gap: 5px;
+            list-style: none;
+        }
+
+        .page-item a {
+            display: inline-flex;
+            width: 32px;
+            height: 32px;
+            justify-content: center;
+            align-items: center;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            color: #495057;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .page-item.active a, .page-item a:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="ldii.png" alt="Logo LDII">
+            <h1>Pemantauan Hilal LDII</h1>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
+            <li class="nav-item active"><a href="#" class="nav-link"><i class="fas fa-eye"></i> Pantauan</a></li>
+            <li>
+                <div class="user-profile">
+                    <i class="fas fa-user-circle" style="color: var(--primary-color);"></i>
+                    <span style="font-size: 13px; font-weight: 500;">AbidBima12</span>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="dashboard.html">Beranda</a> &raquo; <a href="in">Pantau</a> &raquo; <span>Manage</span>
+        </div>
+
+        <div class="page-header">
+            <div>
+                <h2>Data Pantauan Hilal</h2>
+                <p>Manajemen dan rekapitulasi pelaporan penugasan hilal nasional.</p>
+            </div>
+            <a href="#" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Pantauan</a>
+        </div>
+
+        <div class="table-toolbar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="tableSearch" placeholder="Cari pemantau, lokasi, wilayah...">
+            </div>
+            <div class="toolbar-buttons">
+                <button class="btn btn-outline" onclick="alert('Fitur Export Excel dipicu!')"><i class="fas fa-file-excel" style="color: #1f7244;"></i> Excel</button>
+                <button class="btn btn-outline" onclick="window.print()"><i class="fas fa-print"></i> Cetak</button>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-responsive">
+                <table class="modern-table" id="hilalTable">
+                    <thead>
+                        <tr>
+                            <th>Periode</th>
+                            <th>Lokasi & Wilayah</th>
+                            <th>Tim Pemantau</th>
+                            <th>Instrumen</th>
+                            <th>Waktu</th>
+                            <th>Hasil & Status</th>
+                            <th>Dokumentasi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <p class="info-title">Safar 1448 H</p>
+                                <p class="info-sub">Tahun: 1448</p>
+                            </td>
+                            <td class="info-cell">
+                                <p class="info-title">Anjungan Bandara YIA Kulon Progo</p>
+                                <p class="info-sub">DI Yogyakarta &bull; KABUPATEN KULON PROGO</p>
+                                <p class="info-sub" style="font-style: italic;">TEMON, PALIHAN</p>
+                            </td>
+                            <td class="info-cell">
+                                <p><span class="info-sub">Melaporkan:</span> <strong>Abdurrahman Shaleh, S. Kom</strong> <span class="badge-phone">(085106133968)</span></p>
+                                <p style="margin-top: 4px;"><span class="info-sub">Rekan:</span> <strong>Abid Bima Fadhilah, S.Kom.</strong> <span class="badge-phone">(089646827233)</span></p>
+                            </td>
+                            <td>
+                                <p class="info-title">Teropong (Manual)</p>
+                            </td>
+                            <td>
+                                <p class="info-title"><i class="far fa-clock" style="color: var(--primary-color);"></i> 18:00</p>
+                            </td>
+                            <td>
+                                <span class="badge badge-danger">Tidak Terlihat</span>
+                                <span class="status-reason">Sebab: Mendung/Berawan</span>
+                            </td>
+                            <td style="text-align: center; color: var(--text-muted);">-</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p class="info-title">Safar 1448 H</p>
+                                <p class="info-sub">Tahun: 1448</p>
+                            </td>
+                            <td class="info-cell">
+                                <p class="info-title">Anjungan Bandara YIA Kulon Progo</p>
+                                <p class="info-sub">DI Yogyakarta &bull; KABUPATEN KULON PROGO</p>
+                                <p class="info-sub" style="font-style: italic;">TEMON, PALIHAN</p>
+                            </td>
+                            <td class="info-cell">
+                                <p><span class="info-sub">Melaporkan:</span> <strong>Abdurrahman Shaleh, S. Kom</strong> <span class="badge-phone">(085106133968)</span></p>
+                                <p style="margin-top: 4px;"><span class="info-sub">Rekan:</span> <strong>Abid Bima Fadhilah, S.Kom.</strong> <span class="badge-phone">(089646827233)</span></p>
+                            </td>
+                            <td><p class="info-title">Teropong (Manual)</p></td>
+                            <td><p class="info-title"><i class="far fa-clock" style="color: var(--primary-color);"></i> 18:00</p></td>
+                            <td>
+                                <span class="badge badge-danger">Tidak Terlihat</span>
+                                <span class="status-reason">Sebab: Mendung/Berawan</span>
+                            </td>
+                            <td style="text-align: center; color: var(--text-muted);">-</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p class="info-title">Safar 1448 H</p>
+                                <p class="info-sub">Tahun: 1448</p>
+                            </td>
+                            <td class="info-cell">
+                                <p class="info-title">Anjungan Bandara YIA Kulon Progo</p>
+                                <p class="info-sub">DI Yogyakarta &bull; KABUPATEN KULON PROGO</p>
+                                <p class="info-sub" style="font-style: italic;">TEMON, PALIHAN</p>
+                            </td>
+                            <td class="info-cell">
+                                <p><span class="info-sub">Melaporkan:</span> <strong>Abdurrahman Shaleh, S. Kom</strong> <span class="badge-phone">(085106133968)</span></p>
+                                <p style="margin-top: 4px;"><span class="info-sub">Rekan:</span> <strong>Abid Bima Fadhilah, S.Kom.</strong> <span class="badge-phone">(089646827233)</span></p>
+                            </td>
+                            <td><p class="info-title">Teropong (Manual)</p></td>
+                            <td><p class="info-title"><i class="far fa-clock" style="color: var(--primary-color);"></i> 18:00</p></td>
+                            <td>
+                                <span class="badge badge-danger">Tidak Terlihat</span>
+                                <span class="status-reason">Sebab: Mendung/Berawan</span>
+                            </td>
+                            <td style="text-align: center; color: var(--text-muted);">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-footer">
+                <span id="tableInfo">Menampilkan 1-3 dari 3 hasil</span>
+                <ul class="pagination">
+                    <li class="page-item active"><a href="#">1</a></li>
+                    <li class="page-item"><a href="#">2</a></li>
+                    <li class="page-item"><a href="#">&raquo;</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('tableSearch');
+            const tableRows = document.querySelectorAll('#hilalTable tbody tr');
+            const tableInfo = document.getElementById('tableInfo');
+
+            // Fitur Live Search / Pencarian Instan Real-time
+            searchInput.addEventListener('input', function() {
+                const filterValue = this.value.toLowerCase().trim();
+                let countVisible = 0;
+
+                tableRows.forEach(row => {
+                    const textContent = row.textContent.toLowerCase();
+                    
+                    if (textContent.includes(filterValue)) {
+                        row.style.display = "";
+                        countVisible++;
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+
+                // Perbarui info rangkuman jumlah data aktif
+                tableInfo.textContent = `Menampilkan 1-${countVisible} dari ${countVisible} hasil`;
+            });
+        });
+    </script>
+</body>
+</html>
